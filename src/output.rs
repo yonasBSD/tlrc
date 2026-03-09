@@ -140,17 +140,16 @@ impl<'a> PageRenderer<'a> {
             // Finding the last double ending brace is required for special cases with three
             // closing curly braces ("}}}").
             // The first brace is inside the placeholder, and the last two mark the end of it.
-            if let Some(idx) = part.rfind("}}") {
-                // The first part of the second split contains the part to be highlighted.
-                //
-                // "aa bb {{cc}} {{dd}} ee"
-                // 0: "aa bb "   => does not match
-                // 1: "cc}} "    => 0: "cc"    (highlighted)
-                //                  1: "}}"
-                // 2: "dd}} ee"  => 0: "dd"    (highlighted)
-                //                  1: "}} ee"
-                let (inside, outside) = part.split_at(idx);
-
+            //
+            // The first part of the second split contains the part to be highlighted.
+            //
+            // "aa bb {{cc}} {{dd}} ee"
+            // 0: "aa bb "   => does not match
+            // 1: "cc}} "    => 0: "cc"    (highlighted)
+            //                  1: " "
+            // 2: "dd}} ee"  => 0: "dd"    (highlighted)
+            //                  1: " ee"
+            if let Some((inside, outside)) = part.rsplit_once("}}") {
                 // Select the long or short option.
                 // Skip if the user wants to display both or if the placeholder doesn't contain
                 // option selection (`[-s|--long]`).
@@ -173,8 +172,7 @@ impl<'a> PageRenderer<'a> {
                     write_paint!(buf, inside.paint(self.style.placeholder));
                 }
 
-                // `outside` begins with "}}". We need to cut that out.
-                write_paint!(buf, &outside[2..].paint(style_normal));
+                write_paint!(buf, outside.paint(style_normal));
             } else {
                 // Highlight ending not found.
                 write_paint!(buf, part.paint(style_normal));
