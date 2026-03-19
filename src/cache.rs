@@ -92,6 +92,9 @@ impl<'a> Cache<'a> {
             .timeout_connect(HTTP_TIMEOUT)
             .tls_config(
                 TlsConfig::builder()
+                    .unversioned_rustls_crypto_provider(
+                        rustls::crypto::ring::default_provider().into(),
+                    )
                     .root_certs(RootCerts::PlatformVerifier)
                     .build(),
             )
