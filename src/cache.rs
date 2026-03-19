@@ -518,7 +518,13 @@ impl<'a> Cache<'a> {
     /// Search for pages containing a keyword.
     ///
     /// When `platform` is `None`, search all platforms.
-    pub fn search(&self, query: &str, platform: Option<&str>, languages: &[String]) -> Result<()> {
+    pub fn search(
+        &self,
+        query: &str,
+        platform: Option<&str>,
+        languages: &[String],
+        languages_are_from_cli: bool,
+    ) -> Result<()> {
         if let Some(p) = platform {
             self.get_platforms_and_check(p)?;
         }
@@ -546,7 +552,11 @@ impl<'a> Cache<'a> {
         }
 
         if matches.is_empty() {
-            return Err(Error::new("no pages matched your search term."));
+            let e = Error::new("no pages matched your search term.");
+            if languages_are_from_cli {
+                return Err(e.describe(Error::TRY_NO_EXPLICIT_LANGUAGE));
+            }
+            return Err(e);
         }
 
         matches.sort_unstable_by(|(name1, _, _), (name2, _, _)| name1.cmp(name2));
@@ -925,19 +935,20 @@ mod tests {
             "pages.en/android/c.md",
         ]);
         let c = Cache::new(tmpdir.path());
+        let l = ["en".to_owned()];
 
         // 'common' should always be searched.
-        assert!(c.search("a", None, &["en".to_owned()]).is_ok());
-        assert!(c.search("a", Some("linux"), &["en".to_owned()]).is_ok());
-        assert!(c.search("a", Some("common"), &["en".to_owned()]).is_ok());
+        assert!(c.search("a", None, &l, false).is_ok());
+        assert!(c.search("a", Some("linux"), &l, false).is_ok());
+        assert!(c.search("a", Some("common"), &l, false).is_ok());
 
-        assert!(c.search("b", None, &["en".to_owned()]).is_ok());
-        assert!(c.search("b", Some("linux"), &["en".to_owned()]).is_ok());
-        assert!(c.search("b", Some("common"), &["en".to_owned()]).is_err()); // 'b' is in linux
+        assert!(c.search("b", None, &l, false).is_ok());
+        assert!(c.search("b", Some("linux"), &l, false).is_ok());
+        assert!(c.search("b", Some("common"), &l, false).is_err()); // 'b' is in linux
 
-        assert!(c.search("c", None, &["en".to_owned()]).is_ok());
-        assert!(c.search("c", Some("android"), &["en".to_owned()]).is_ok());
-        assert!(c.search("c", Some("linux"), &["en".to_owned()]).is_err()); // 'c' is in android
+        assert!(c.search("c", None, &l, false).is_ok());
+        assert!(c.search("c", Some("android"), &l, false).is_ok());
+        assert!(c.search("c", Some("linux"), &l, false).is_err()); // 'c' is in android
     }
 
     #[test]

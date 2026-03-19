@@ -135,7 +135,7 @@ fn run(cli: Cli) -> Result<()> {
     } else if let Some(query) = cli.search {
         // All platforms should be searched when `-p` isn't used.
         let search_plat = cli.platform.as_deref().map(|_| platform);
-        cache.search(&query, search_plat, &languages)?;
+        cache.search(&query, search_plat, &languages, languages_are_from_cli)?;
     } else if cli.info {
         cache.info(&cfg)?;
     } else if cli.list_platforms {
@@ -160,7 +160,7 @@ fn run(cli: Cli) -> Result<()> {
         if page_paths.is_empty() {
             let e = Error::new("page not found.");
             return if languages_are_from_cli {
-                Err(e.describe("Try running tldr without --language."))
+                Err(e.describe(Error::TRY_NO_EXPLICIT_LANGUAGE))
             } else {
                 // If the cache has been updated, don't suggest running 'tldr --update'.
                 Err(e.describe(Error::desc_page_does_not_exist(!forced_update_no_page)))

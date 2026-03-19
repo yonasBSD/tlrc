@@ -31,6 +31,8 @@ impl Error {
     pub const DESC_AUTO_UPDATE_ERR: &'static str = "\n\nAn error occurred during the automatic update.\n\
         To skip updating the cache, run tldr with --offline.";
 
+    pub const TRY_NO_EXPLICIT_LANGUAGE: &'static str = "Try running tldr without --language.";
+
     pub fn new<T>(message: T) -> Self
     where
         T: Display,
