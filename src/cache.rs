@@ -675,9 +675,11 @@ impl<'a> Cache<'a> {
     /// List languages (used in shell completions).
     pub fn list_languages(&self) -> Result<()> {
         let mut stdout = io::stdout().lock();
+        let mut lang_dirs = self.get_lang_dirs()?.collect::<io::Result<Vec<String>>>()?;
+        lang_dirs.sort_unstable();
 
-        for dir in self.get_lang_dirs()? {
-            writeln!(stdout, "{}", dir?.strip_prefix("pages.").unwrap())?;
+        for dir in lang_dirs {
+            writeln!(stdout, "{}", dir.strip_prefix("pages.").unwrap())?;
         }
 
         Ok(())
