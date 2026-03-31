@@ -1,5 +1,6 @@
 use std::borrow::Cow;
 use std::env;
+use std::fmt;
 use std::fs;
 use std::io::{self, Write};
 use std::path::{Path, PathBuf};
@@ -14,7 +15,7 @@ use crate::cache::Cache;
 use crate::error::{Error, ErrorKind, Result};
 use crate::util;
 
-fn hex_to_rgb<'de, D>(deserializer: D) -> std::result::Result<[u8; 3], D::Error>
+fn hex_to_rgb<'de, D>(deserializer: D) -> Result<[u8; 3], D::Error>
 where
     D: Deserializer<'de>,
 {
@@ -24,11 +25,11 @@ where
     impl Visitor<'_> for HexColorVisitor {
         type Value = [u8; 3];
 
-        fn expecting(&self, formatter: &mut std::fmt::Formatter) -> std::fmt::Result {
+        fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
             formatter.write_str(HEX_ERR)
         }
 
-        fn visit_str<E>(self, v: &str) -> std::result::Result<Self::Value, E>
+        fn visit_str<E>(self, v: &str) -> Result<Self::Value, E>
         where
             E: serde::de::Error,
         {

@@ -2,7 +2,6 @@ use std::fmt::Display;
 use std::io;
 use std::path::Path;
 use std::process::ExitCode;
-use std::result::Result as StdResult;
 
 use log::error;
 use yansi::Paint;
@@ -22,7 +21,7 @@ pub struct Error {
     message: String,
 }
 
-pub type Result<T> = StdResult<T, Error>;
+pub type Result<T, E = Error> = std::result::Result<T, E>;
 
 impl Error {
     pub const DESC_NO_INTERNET: &'static str =

@@ -1,5 +1,5 @@
 .\" vim: colorcolumn=100 textwidth=100
-.TH "TLRC" "1" "2025-10-01"  "tlrc 1.12.0" "tlrc manual"
+.TH "TLRC" "1" "2026-03-31"  "tlrc 1.13.0" "tlrc manual"
 .nh
 .ad l
 .SH NAME
@@ -106,11 +106,13 @@ This is the default.
 .
 .TP 4
 .B --edit
-Display a link to edit the shown page on GitHub.
+Display a link to edit the shown page on GitHub. Equivalent of setting\&
+\fIoutput.edit_link\fR=\fBtrue\fR in the config.
 .sp
 The following link will be displayed:
 .br
-https://github.com/tldr-pages/tldr/edit/main/pages/\fB{{platform}}\fR/\fB{{page-name}}\fR.md
+https://github.com/tldr-pages/tldr/edit/main/\
+\fB{{pages|pages.language}}\fR/\fB{{platform}}\fR/\fB{{page-name}}\fR.md
 .
 .TP 4
 .B -o, --offline

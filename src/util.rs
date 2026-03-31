@@ -94,26 +94,22 @@ pub fn get_languages_from_env(out_vec: &mut Vec<String>) {
         return;
     };
 
-    let var_language = env::var("LANGUAGE");
-
-    let languages = var_language
-        .as_deref()
+    env::var("LANGUAGE")
         .unwrap_or_default()
         .split_terminator(':')
-        .chain(iter::once(&*var_lang));
-
-    for lang in languages {
-        if lang.len() >= 5 && lang.chars().nth(2) == Some('_') {
-            // <language>_<country> (ll_CC - 5 characters)
-            out_vec.push(lang[..5].to_string());
-            // <language> (ll - 2 characters)
-            out_vec.push(lang[..2].to_string());
-        } else if lang.len() == 2 {
-            out_vec.push(lang.to_string());
-        } else {
-            debug!("invalid language found in LANG or LANGUAGE: '{lang}'");
-        }
-    }
+        .chain(iter::once(&*var_lang))
+        .for_each(|lang| {
+            if lang.len() >= 5 && lang.chars().nth(2) == Some('_') {
+                // <language>_<country> (ll_CC - 5 characters)
+                out_vec.push(lang[..5].to_string());
+                // <language> (ll - 2 characters)
+                out_vec.push(lang[..2].to_string());
+            } else if lang.len() == 2 {
+                out_vec.push(lang.to_string());
+            } else {
+                debug!("invalid language found in LANG or LANGUAGE: '{lang}'");
+            }
+        });
 }
 
 /// Initialize color outputting.

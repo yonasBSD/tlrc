@@ -1,8 +1,8 @@
 [package]
 name = "tlrc"
-version = "1.12.0"
+version = "1.13.0"
 description = "Official tldr client written in Rust"
-authors = ["Lena Pastwa"]
+authors = ["Lena Pastwa <lena@lnps.me>"]
 categories = ["command-line-utilities"]
 keywords = ["tldr"]
 repository = "https://github.com/tldr-pages/tlrc"
@@ -27,12 +27,12 @@ once_cell = "1.21.3"
 ring = "0.17.14"
 rustls = { version = "0.23.37", default-features = false, features = ["ring"] }
 serde = { version = "1.0.219", features = ["derive"] }
-terminal_size = "0.4.3"
-toml = "1.0.7"
+terminal_size = "0.4.4"
+toml = "1.1.0"
 unicode-width = { version = "0.2.2", default-features = false }
 ureq = { version = "3.3.0", default-features = false, features = ["rustls-no-provider", "platform-verifier"] }
 yansi = "1.0.1"
-zip = { version = "8.3.0", default-features = false, features = ["deflate-flate2-zlib-rs"] }
+zip = { version = "8.4.0", default-features = false, features = ["deflate-flate2-zlib-rs"] }
 
 [dev-dependencies]
 assert_cmd = "2.2.0"
@@ -56,7 +56,6 @@ opt-level = 3
 [package.metadata.deb]
 section = "utils"
 priority = "optional"
-conflicts = ["tldr", "tldr-py"]
 extended-description = ""
 assets = [
 	["target/release/tldr", "usr/bin/", "755"],

@@ -1,4 +1,3 @@
-use std::cmp;
 use std::collections::{BTreeMap, HashMap};
 use std::fs::{self, File};
 use std::io::{self, BufRead, BufWriter, Cursor, Write};
@@ -325,16 +324,12 @@ impl<'a> Cache<'a> {
     fn get_platforms(&self) -> Result<&[String]> {
         self.platforms
             .get_or_try_init(|| {
-                let mut result = vec![];
-
-                for entry in fs::read_dir(self.dir.join(ENGLISH_DIR))? {
-                    let entry = entry?;
-                    let Ok(platform) = entry.file_name().into_string() else {
-                        continue;
-                    };
-
-                    result.push(platform);
-                }
+                let mut result = fs::read_dir(self.dir.join(ENGLISH_DIR))?
+                    .filter_map(|res| {
+                        res.map(|ent| ent.file_name().into_string().ok())
+                            .transpose()
+                    })
+                    .collect::<io::Result<Vec<String>>>()?;
 
                 if result.is_empty() {
                     Err(Error::messed_up_cache(
@@ -375,30 +370,25 @@ impl<'a> Cache<'a> {
 
     /// Find a page for the given platform.
     fn find_page_for(&self, fname: &str, platform: &str, lang_dirs: &[String]) -> Option<PathBuf> {
-        for lang_dir in lang_dirs {
-            let path = self.dir.join(lang_dir).join(platform).join(fname);
-
-            debug!("trying path: {path:?}");
-            if path.is_file() {
-                debug!("page found");
-                return Some(path);
-            }
-        }
-
-        None
+        lang_dirs
+            .iter()
+            .map(|ldir| self.dir.join(ldir).join(platform).join(fname))
+            .inspect(|page_path| debug!("trying path: {page_path:?}"))
+            .find(|page_path| page_path.is_file())
+            .inspect(|_| debug!("page found"))
     }
 
     /// Find all pages with the given name.
     pub fn find(&self, name: &str, languages: &[String], platform: &str) -> Result<Vec<PathBuf>> {
         // https://github.com/tldr-pages/tldr/blob/main/CLIENT-SPECIFICATION.md#page-resolution
 
-        let platforms = self.get_platforms_and_check(platform)?;
-        let file = format!("{name}.md");
-        debug!("searching for page: '{file}'");
-
-        let mut result = vec![];
         // We can't sort here - order is defined by the user.
         let lang_dirs = self.languages_to_dirs_checked(languages, false)?;
+        let platforms = self.get_platforms_and_check(platform)?;
+
+        let mut result = vec![];
+        let file = format!("{name}.md");
+        debug!("searching for page: '{file}'");
 
         // `common` is always searched, so we skip the search for the specified platform
         // if the user has requested only `common` (to prevent searching twice)
@@ -530,7 +520,6 @@ impl<'a> Cache<'a> {
         }
 
         let lang_dirs = self.languages_to_dirs_checked(languages, true)?;
-
         let platforms = match platform {
             Some("common") => vec!["common"],
             Some(p) => vec![p, "common"],
@@ -625,10 +614,7 @@ impl<'a> Cache<'a> {
                 let Ok(dir) = ent.file_name().into_string() else {
                     return None;
                 };
-                if !ent.path().is_dir() || !dir.starts_with("pages.") {
-                    return None;
-                }
-                Some(Ok(dir))
+                (ent.path().is_dir() && dir.starts_with("pages.")).then_some(Ok(dir))
             }
             Err(e) => Some(Err(e)),
         });
@@ -637,19 +623,12 @@ impl<'a> Cache<'a> {
 
     /// Convert languages to language directories (i.e. prepend 'pages.') and return an error if
     /// none of the provided languages is installed.
-    pub fn languages_to_dirs_checked(
-        &self,
-        languages: &[String],
-        sort: bool,
-    ) -> Result<Vec<String>> {
+    fn languages_to_dirs_checked(&self, languages: &[String], sort: bool) -> Result<Vec<String>> {
         let mut lang_dirs: Vec<String> = languages
             .iter()
             .filter_map(|x| {
                 let dir = format!("pages.{x}");
-                if !self.subdir_exists(&dir) {
-                    return None;
-                }
-                Some(dir)
+                self.subdir_exists(&dir).then_some(dir)
             })
             .collect();
 
@@ -724,8 +703,8 @@ impl<'a> Cache<'a> {
         }
 
         writeln!(stdout, "Installed languages:")?;
-        let width = cmp::max(n_map.keys().map(String::len).max().unwrap(), 5);
-        //                                  "total" is 5 characters long. ^^
+        let width = n_map.keys().map(String::len).max().unwrap().max(5);
+        //                            "total" is 5 characters long. ^^^
 
         for (lang_dir, n) in n_map {
             let lang = lang_dir.strip_prefix("pages.").unwrap();

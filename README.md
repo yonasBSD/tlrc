@@ -147,6 +147,8 @@ show_title = true
 platform_title = false
 # Prefix descriptions of examples with hyphens.
 show_hyphens = false
+# Display a link to edit the shown page on GitHub.
+edit_link = false
 # Use a custom string instead of a hyphen.
 example_prefix = "- "
 # Set the max line length. 0 means to use the terminal width.

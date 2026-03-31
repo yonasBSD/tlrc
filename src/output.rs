@@ -112,11 +112,11 @@ impl<'a> PageRenderer<'a> {
             // 0: "More information: " => does not match
             // 1: "s://example.com>."  => 0: "s://example.com" (highlighted)
             //                            1: ">."
-            if let Some(part_split) = part.split_once('>') {
+            if let Some((inside, outside)) = part.split_once('>') {
                 // "<http" is used to detect URLs. It must be added back.
-                let hl = format!("http{}", part_split.0);
+                let hl = format!("http{inside}");
                 write_paint!(buf, hl.paint(self.style.url));
-                write_paint!(buf, part_split.1.paint(style_normal));
+                write_paint!(buf, outside.paint(style_normal));
             } else {
                 // Highlight ending not found.
                 write_paint!(buf, part.paint(style_normal));
