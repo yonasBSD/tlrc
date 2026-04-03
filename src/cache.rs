@@ -703,8 +703,8 @@ impl<'a> Cache<'a> {
         }
 
         writeln!(stdout, "Installed languages:")?;
-        let width = n_map.keys().map(String::len).max().unwrap().max(5);
-        //                            "total" is 5 characters long. ^^^
+        let width = n_map.keys().map(|x| x.len() - 6).max().unwrap().max(5);
+        //                         "pages.".len() ^^       total".len() ^^^
 
         for (lang_dir, n) in n_map {
             let lang = lang_dir.strip_prefix("pages.").unwrap();
