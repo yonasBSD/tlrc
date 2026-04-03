@@ -56,6 +56,7 @@ opt-level = 3
 [package.metadata.deb]
 section = "utils"
 priority = "optional"
+license-file = ["LICENSE", "4"]
 extended-description = ""
 assets = [
 	["target/release/tldr", "usr/bin/", "755"],
@@ -63,5 +64,4 @@ assets = [
 	["completions/tldr.bash", "usr/share/bash-completion/completions/tldr", "644"],
 	["completions/_tldr", "usr/share/zsh/vendor-completions/", "644"],
 	["completions/tldr.fish", "usr/share/fish/vendor_completions.d/", "644"],
-	["LICENSE", "usr/share/licenses/tlrc", "644"]
 ]
