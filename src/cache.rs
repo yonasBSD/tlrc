@@ -256,7 +256,7 @@ impl<'a> Cache<'a> {
         for (lang_dir, mut archive) in archives {
             // `list_all_vec` can fail when `pages.en` is empty, hence the default of 0.
             #[allow(clippy::cast_possible_truncation, clippy::cast_possible_wrap)]
-            let n_existing = self.list_all_vec(&lang_dir).map(|v| v.len()).unwrap_or(0) as i32;
+            let n_existing = self.list_all_vec(&lang_dir).map_or(0, |v| v.len()) as i32;
 
             let lang_dir_full = self.dir.join(&lang_dir);
             if lang_dir_full.is_dir() {
