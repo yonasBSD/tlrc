@@ -38,6 +38,14 @@ Install [tlrc](https://search.nixos.org/packages?channel=unstable&show=tlrc) fro
 
 Install [tlrc](https://aur.archlinux.org/packages/tlrc) (from source) or [tlrc-bin](https://aur.archlinux.org/packages/tlrc-bin) (prebuilt) from the AUR.
 
+### Void Linux
+
+Install [tlrc](https://voidlinux.org/packages/?q=tlrc) with XBPS:
+
+```shell
+xbps-install tlrc
+```
+
 ### openSUSE
 
 Install [tlrc](https://software.opensuse.org/package/tlrc) with Zypper:
